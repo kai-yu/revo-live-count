@@ -23,7 +23,7 @@ interface LiveCount {
     count: number;
 }
 
-export async function saveLiveCount(location: string, count: number, filePath: string): Promise<void> {
+export function saveLiveCount(location: string, count: number, filePath: string): void {
     console.log('Saving live count:', count);
 
     // Melbourne timestamp
@@ -48,4 +48,12 @@ export async function saveLiveCount(location: string, count: number, filePath: s
     fs.writeFileSync(filePath, JSON.stringify(liveCounts, null, 2));
 }
 
-fetchLiveCount('Noble Park');
+export async function main(): Promise<void> {
+    const location = 'Noble Park';
+    const filePath = path.join(__dirname, `live-count.json`);
+
+    console.log('Fetching live count for:', location);
+    const count = await fetchLiveCount(location);
+
+    saveLiveCount(location, count, filePath);
+}

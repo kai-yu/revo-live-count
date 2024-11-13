@@ -1,12 +1,11 @@
-import { fetchLiveCount, saveLiveCount } from './index';
+import { fetchLiveCount, saveLiveCount, main } from './index';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
-import fs from 'fs';
+import fs, { read } from 'fs';
 import path from 'path';
 
 describe('fetchLiveCount', () => {
     it('should fetch the Noble Park live count', async () => {
-        // spy on axios response
         const axiosGetSpy = jest.spyOn(axios, 'get');
         const location = 'Noble Park';
         axiosGetSpy.mockResolvedValue({
@@ -27,7 +26,6 @@ describe('fetchLiveCount', () => {
     });
 
     it('should return 0 on error', async () => {
-        // spy on axios response
         const axiosGetSpy = jest.spyOn(axios, 'get');
         const location = 'Noble Park';
         axiosGetSpy.mockRejectedValue('error');
@@ -52,9 +50,7 @@ describe('saveLiveCount', () => {
     });
 
     it('should save the live count to a non existing file', async () => {
-        // spy on console.log
         const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-        // spy on fs.writeFileSync
         const fsWriteFileSyncSpy = jest.spyOn(fs, 'writeFileSync');
 
         const location = 'Noble Park';
@@ -70,9 +66,7 @@ describe('saveLiveCount', () => {
     });
 
     it('should save the live count to an existing file', async () => {
-        // spy on console.log
         const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-        // spy on fs.writeFileSync
         const fsWriteFileSyncSpy = jest.spyOn(fs, 'writeFileSync');
 
         const location = 'Noble Park';
@@ -92,9 +86,7 @@ describe('saveLiveCount', () => {
     });
 
     it('should save the live count to an existing file with existing data', async () => {
-        // spy on console.log
         const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation();
-        // spy on fs.writeFileSync
         const fsWriteFileSyncSpy = jest.spyOn(fs, 'writeFileSync');
 
         const location = 'Noble Park';
@@ -118,5 +110,40 @@ describe('saveLiveCount', () => {
             expect.stringMatching(filePath),
             expect.stringMatching(/"count": 123/),
         );
+    });
+});
+
+describe('main', () => {
+    it('should fetch and save the live count', async () => {
+        const axiosGetSpy = jest.spyOn(axios, 'get');
+        axiosGetSpy.mockResolvedValue({
+            status: 200,
+            statusText: 'OK',
+            headers: {},
+            config: { url: 'https://revofitness.com.au/livemembercount/' },
+            data: `
+        <div data-location="Noble Park">
+          <span class="live-count">123</span>
+        </div>
+        `,
+        });
+
+        const mockFileSystem = {
+            existsSync: jest.fn().mockReturnValue(false),
+            writeFileSync: jest.fn(),
+            readFileSync: jest.fn().mockReturnValue('[]'),
+        };
+
+        jest.spyOn(fs, 'existsSync').mockImplementation(mockFileSystem.existsSync);
+        const fsWriteFileSyncSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(mockFileSystem.writeFileSync);
+        const fsReadFileSyncSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(mockFileSystem.readFileSync);
+
+        await main();
+
+        expect(fsWriteFileSyncSpy).toHaveBeenCalledWith(
+            expect.stringMatching(/live-count.json/),
+            expect.stringMatching(/"count": 123/),
+        );
+        expect(fsReadFileSyncSpy).toHaveBeenCalledWith(expect.stringMatching(/live-count.json/), 'utf-8');
     });
 });
