@@ -8,7 +8,7 @@ export async function fetchLiveCount(location: string): Promise<number> {
         const html = response.data;
         const $ = cheerio.load(html as string);
 
-        return parseInt($(`div[data-location="${location}"] .live-count`).text().trim(), 10);
+        return parseInt($(`span[data-live-count="${location}"]`).text().trim(), 10);
     } catch (error) {
         console.error('Error fetching live count:', error);
 

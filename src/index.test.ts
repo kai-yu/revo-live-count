@@ -1,4 +1,4 @@
-import { dateToYmd, JSON_FILE_PREFIX, LOCATION, main, TIMEZONE } from '.';
+import { dateToYmd, JSON_FILE_PREFIX, LOCATION, main, TIMEZONE } from './index';
 import { scrape } from './scraper';
 
 jest.mock('./scraper', () => ({
@@ -28,10 +28,7 @@ describe('index.ts', () => {
 
         await main();
 
-        expect(scrape).toHaveBeenCalledWith(
-            LOCATION,
-            `${JSON_FILE_PREFIX}-${dateToYmd(date, 'Australia/Melbourne')}.json`,
-        );
+        expect(scrape).toHaveBeenCalledWith(LOCATION, `${JSON_FILE_PREFIX}-${dateToYmd(date, TIMEZONE)}.json`);
         expect(scrape).toHaveBeenCalledTimes(1);
     });
 });
