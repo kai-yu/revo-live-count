@@ -1,6 +1,6 @@
 import { scrape } from "./scraper";
 
-export const JSON_FILE_PREFIX = 'live-counts';
+export const JSON_FILE_PREFIX = 'out/live-counts';
 export const TIMEZONE = 'Australia/Melbourne';
 export const LOCATION = 'Noble Park';
 
