@@ -23,3 +23,13 @@ jobs:
 
       - name: Run TypeScript script
         run: npm run scrape # Replace with the path to your TypeScript file
+
+      - name: Commit changes to repository
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add out/. # Path to the output file
+          git commit -m "Update output file" || echo "No changes to commit"
+          git push origin main  # Replace with your branch name
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
