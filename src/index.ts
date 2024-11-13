@@ -1,5 +1,7 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
 
 export async function fetchLiveCount(location: string): Promise<number> {
     try {
@@ -13,6 +15,37 @@ export async function fetchLiveCount(location: string): Promise<number> {
 
         return 0;
     }
+}
+
+interface LiveCount {
+    location: string;
+    timestamp: string;
+    count: number;
+}
+
+export async function saveLiveCount(location: string, count: number, filePath: string): Promise<void> {
+    console.log('Saving live count:', count);
+
+    // Melbourne timestamp
+    const timestamp = new Date().toLocaleString('en-AU', {
+        timeZone: 'Australia/Melbourne',
+    });
+
+    if (!fs.existsSync(filePath)) {
+        fs.writeFileSync(filePath, '[]');
+    }
+
+    const liveCount: LiveCount = {
+        location,
+        timestamp,
+        count,
+    };
+    const data = fs.readFileSync(filePath, 'utf-8');
+    const liveCounts = JSON.parse(data);
+
+    liveCounts.push(liveCount);
+
+    fs.writeFileSync(filePath, JSON.stringify(liveCounts, null, 2));
 }
 
 fetchLiveCount('Noble Park');
