@@ -1,3 +1,11 @@
 import { scrape } from "./scraper";
 
-scrape('Noble Park', 'live-counts.json');
+export async function main(): Promise<void>
+{
+    await scrape('Noble Park', 'live-counts.json');
+}
+
+if (require.main === module)
+{
+    main();
+}
