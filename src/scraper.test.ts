@@ -1,7 +1,7 @@
-import { fetchLiveCount, saveLiveCount, main } from './index';
+import { fetchLiveCount, saveLiveCount, scrape } from './scraper';
 import axios from 'axios';
 import { randomUUID } from 'crypto';
-import fs, { read } from 'fs';
+import fs from 'fs';
 import path from 'path';
 
 describe('fetchLiveCount', () => {
@@ -114,15 +114,28 @@ describe('saveLiveCount', () => {
 });
 
 describe('main', () => {
+    let filePath = '';
+
+    beforeEach(() => {
+        filePath = path.join(__dirname, `live-count-${randomUUID()}.test.json`);
+    });
+
+    afterEach(() => {
+        if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+        }
+    });
+
     it('should fetch and save the live count', async () => {
         const axiosGetSpy = jest.spyOn(axios, 'get');
+        const location = 'Noble Park';
         axiosGetSpy.mockResolvedValue({
             status: 200,
             statusText: 'OK',
             headers: {},
             config: { url: 'https://revofitness.com.au/livemembercount/' },
             data: `
-        <div data-location="Noble Park">
+        <div data-location="${location}">
           <span class="live-count">123</span>
         </div>
         `,
@@ -138,12 +151,12 @@ describe('main', () => {
         const fsWriteFileSyncSpy = jest.spyOn(fs, 'writeFileSync').mockImplementation(mockFileSystem.writeFileSync);
         const fsReadFileSyncSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(mockFileSystem.readFileSync);
 
-        await main();
+        await scrape(location, filePath);
 
         expect(fsWriteFileSyncSpy).toHaveBeenCalledWith(
-            expect.stringMatching(/live-count.json/),
+            expect.stringMatching(filePath),
             expect.stringMatching(/"count": 123/),
         );
-        expect(fsReadFileSyncSpy).toHaveBeenCalledWith(expect.stringMatching(/live-count.json/), 'utf-8');
+        expect(fsReadFileSyncSpy).toHaveBeenCalledWith(expect.stringMatching(filePath), 'utf-8');
     });
 });
