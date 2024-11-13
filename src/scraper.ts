@@ -49,6 +49,7 @@ export function saveLiveCount(location: string, count: number, filePath: string)
 
 export async function scrape(location: string, filePath: string): Promise<void> {
     console.log('Fetching live count for:', location);
+
     await fetchLiveCount(location)
         .then((count) => saveLiveCount(location, count, filePath));
 }
