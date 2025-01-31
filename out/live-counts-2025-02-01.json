@@ -43,5 +43,10 @@
     "location": "Noble Park",
     "timestamp": "01/02/2025, 8:01:44 am",
     "count": 42
+  },
+  {
+    "location": "Noble Park",
+    "timestamp": "01/02/2025, 9:02:02 am",
+    "count": 65
   }
 ]
