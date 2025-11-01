@@ -13,5 +13,10 @@
     "location": "Noble Park",
     "timestamp": "02/11/2025, 2:02:14 am",
     "count": 6
+  },
+  {
+    "location": "Noble Park",
+    "timestamp": "02/11/2025, 3:02:13 am",
+    "count": null
   }
 ]
