@@ -18,5 +18,10 @@
     "location": "Noble Park",
     "timestamp": "18/01/2026, 3:02:06 am",
     "count": 2
+  },
+  {
+    "location": "Noble Park",
+    "timestamp": "18/01/2026, 4:02:04 am",
+    "count": null
   }
 ]
